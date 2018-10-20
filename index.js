@@ -4,27 +4,27 @@ const PORT = process.env.PORT || 5000
 
 const app = express();
 
-app.get('/api/v1/pool', function(req, res) {
+app.get('/api/v1/pools', function(req, res) {
   res.send('stub..');
 });
 
-app.post('/api/v1/pool', function(req, res) {
+app.post('/api/v1/pools', function(req, res) {
   res.send('stub..');
 });
 
-app.get('/api/v1/pool/:poolId', function(req, res) {
+app.get('/api/v1/pools/:poolId', function(req, res) {
   res.send(req.params.poolId);
 });
 
-app.post('/pool/:poolId/user/:userId', function(req, res) {
+app.post('api/v1/pools/:poolId/users/:userId', function(req, res) {
   res.send({ 'poolId': req.params.poolId, 'userId': req.params.userId });
 });
 
-app.delete('/pool/:poolId/user/:userId', function(req, res) {
+app.delete('api/v1/pools/:poolId/users/:userId', function(req, res) {
   res.send({ 'poolId': req.params.poolId, 'userId': req.params.userId });
 });
 
-app.post('/pool/{id}/user/{userId}/purchase', function(req, res) {
+app.post('api/v1/pools/:poolId/users/:userId/purchase', function(req, res) {
   res.send({ 'poolId': req.params.poolId, 'userId': req.params.userId });
 });
 
