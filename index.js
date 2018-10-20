@@ -1,19 +1,43 @@
+const PoolController = require('./src/PoolController.js');
+
 const express = require('express')
 const path = require('path')
 const PORT = process.env.PORT || 5000
 
+const poolController = new PoolController();
+
 const app = express();
 
 app.get('/api/v1/pools', function(req, res) {
-  res.send('stub..');
+	poolController.getPools()
+    .then(poolPromises => Promise.all(poolPromises)
+      .then(pools => {
+        res.send(pools);
+      }),
+    err => {
+      console.log(err);
+      res.send(err);
+    });
 });
 
 app.post('/api/v1/pools', function(req, res) {
-  res.send('stub..');
+  req.on('data', data => {
+    const body = JSON.parse(data);
+
+    if (!body) {
+      res.send('incomplete');
+      return;
+    }
+
+    poolController.createPool(body)
+      .then(pool => res.send(pool), err => res.send(err));
+  });
 });
 
 app.get('/api/v1/pools/:poolId', function(req, res) {
-  res.send(req.params.poolId);
+	const { poolId } = req.params;
+	poolController.getPool(req.params.poolId)
+    .then(pools => res.send(pools), err => res.send(err));
 });
 
 app.post('api/v1/pools/:poolId/users/:userId', function(req, res) {
@@ -25,16 +49,8 @@ app.delete('api/v1/pools/:poolId/users/:userId', function(req, res) {
 });
 
 app.post('api/v1/pools/:poolId/users/:userId/purchase', function(req, res) {
-  res.send({ 'poolId': req.params.poolId, 'userId': req.params.userId });
+	const { userId, poolId } = req.params;
+	res.send(poolController.collect(poolId, userId));
 });
 
 app.listen(PORT, () => console.log(`Listening on ${ PORT }`))
-
-
-/*
-
-  .use(express.static(path.join(__dirname, 'public')))
-  .set('views', path.join(__dirname, 'views'))
-  .set('view engine', 'ejs')
-  .get('/', (req, res) => res.render('pages/index'))
-  */
