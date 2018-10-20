@@ -62,9 +62,21 @@ module.exports = class PoolController {
 	}
 }
 
-function fetchTiers(pool) {
-	const { id } = pool;
+function fetchUsers(pool) {
+	if (!pool) return pool;
 
-	return poolTierDao.filter({ poolId: id })
+	const { id } = pool;
+	const poolId = id;
+
+	return poolUserDao.filter({ poolId })
+}
+
+function fetchTiers(pool) {
+	if (!pool) return pool;
+
+	const { id } = pool;
+	const poolId = id;
+
+	return poolTierDao.filter({ poolId })
 		.then(tiers => ({ ...pool, tiers }));
 }

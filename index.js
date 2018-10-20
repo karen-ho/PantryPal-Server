@@ -36,7 +36,7 @@ app.post('/api/v1/pools', function(req, res) {
 
 app.get('/api/v1/pools/:poolId', function(req, res) {
 	const { poolId } = req.params;
-	poolController.getPool(req.params.poolId)
+	poolController.getPool(poolId)
     .then(pools => res.send(pools), err => res.send(err));
 });
 

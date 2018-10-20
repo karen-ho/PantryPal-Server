@@ -28,7 +28,7 @@ module.exports = class Dao {
 					// Find some documents
 					collection.find({ id }).toArray(function(err, docs) {
 						console.log("Found the following records");
-						resolve(docs);
+						resolve(docs[0]);
 				 
 						client.close();
 					});
