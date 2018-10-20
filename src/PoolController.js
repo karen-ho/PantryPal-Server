@@ -1,3 +1,5 @@
+const PaymentManager = require('./PaymentManager.js');
+
 const PoolDao = require('./PoolDao.js');
 const PoolUserDao = require('./PoolUserDao.js');
 const PoolTierDao = require('./PoolTierDao.js');
@@ -11,17 +13,24 @@ module.exports = class PoolController {
 
 	}
 
+	findClosestPools(lat, long) {
+		return poolDao.findNearest(lat, long);
+	}
+
 	getPools() {
 		return poolDao.getAll()
-			.then(pools => pools.map(fetchTiers));
+			.then(pools => Promise.all(pools.map(fetchTiers)))
+			.then(pools => Promise.all(pools.map(fetchUsers)));
 	}
 
 	createPool(pool) {
-		const { tiers } = pool;
+		const { tiers, lat, long } = pool;
 		const copy = { ...pool };
 		delete copy.tiers;
 
-		const poolToSave = copy;
+		const location = { type: 'Point', coordinates: [+long, +lat] };
+		const poolToSave = { ...copy, location };
+
 		return poolDao.create([poolToSave])
 			.then(pools => {
 				const [pool] = pools;
@@ -40,25 +49,54 @@ module.exports = class PoolController {
 
 	getPool(poolId) {
 		return poolDao.get(poolId)
-			.then(fetchTiers);
+			.then(fetchTiers)
+			.then(fetchUsers);
 	}
 
 	join(poolId, userId) {
-		return poolUserDao.filter({ id: poolId, userId, deleted: true })
+		return poolUserDao.filter({ id: poolId, userId, deleted: true, paid: null })
 			.then(res => {
 				if (res) {
 					// toggle the deleted
 					return poolUserDao.update(poolId, { deleted: false, deletedTimestamp: Date.now() });
 				} else {
 					// we create one
-					return poolUserDao.create({ id: poolId, userId, deleted: false, deletedTimestamp: null });
+					return poolUserDao.create({ id: poolId, userId, deleted: false, deletedTimestamp: null, paid: null });
 				}
 			});
 	}
 
+	leave(poolId, userId) {
+		return poolUserDao.filter({ id: poolId, userId, deleted: false, paid: null })
+			.then(res => {
+				if (res) {
+					// toggle the deleted
+					return poolUserDao.update(poolId, { deleted: true, deletedTimestamp: Date.now() });
+				}
+
+				return {};
+			});
+	}
+
 	collect(poolId, userId) {
-		// commit transaction at this point
-		// delete pool entry
+		return poolUserDao.filter({ id: poolId, userId, deleted: false, paid: null })
+			.then(res => {
+				if (res) {
+					// do the order transaction now...
+					PaymentManager.doTransaction()
+						.then(
+							transactionId => {
+								poolUserDao.update(poolId, { paid: Date.now() });
+								return transactionId;
+							},
+							error => error
+						);
+
+					// mark the item as paid
+				}
+
+				return {};
+			});
 	}
 }
 
@@ -68,7 +106,8 @@ function fetchUsers(pool) {
 	const { id } = pool;
 	const poolId = id;
 
-	return poolUserDao.filter({ poolId })
+	return poolUserDao.filter({ poolId, deleted: false })
+		.then(users => ({ ...pool, users}));
 }
 
 function fetchTiers(pool) {

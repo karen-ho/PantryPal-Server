@@ -27,6 +27,11 @@ module.exports = class Dao {
 
 					// Find some documents
 					collection.find({ id }).toArray(function(err, docs) {
+						if (err) {
+							reject(err);
+							client.close();
+						}
+
 						console.log("Found the following records");
 						resolve(docs[0]);
 				 
@@ -57,6 +62,11 @@ module.exports = class Dao {
 
 					// Find some documents
 					collection.find({}).toArray(function(err, docs) {
+						if (err) {
+							reject(err);
+							client.close();
+						}
+
 						console.log("Found the following records");
 						resolve(docs);
 				 
@@ -86,9 +96,16 @@ module.exports = class Dao {
 
 					// Find some documents
 					collection.find(filters).toArray(function(err, docs) {
+						if (err) {
+							reject(err);
+
+							client.close();
+							return;
+						}
+
 						console.log("Found the following records");
 						resolve(docs);
-				 
+
 						client.close();
 					});
 				};
@@ -114,6 +131,11 @@ module.exports = class Dao {
 					const collection = db.collection(this.collection);
 
 					const res = collection.insertMany(elements, function(err, docs) {
+						if (err) {
+							reject(err);
+							client.close();
+						}
+
 						resolve(docs.ops);
 				 
 						client.close();
@@ -142,6 +164,11 @@ module.exports = class Dao {
 
 					// Find some documents
 					collection.updateOne({ id }, { $set: properties }).toArray(function(err, docs) {
+						if (err) {
+							reject(err);
+							client.close();
+						}
+
 						resolve(docs);
 				 
 						client.close();
@@ -171,6 +198,11 @@ module.exports = class Dao {
 
 					// Find some documents
 					collection.updateOne({ id }, { $set: { deleted: true } }).toArray(function(err, docs) {
+						if (err) {
+							reject(err);
+							client.close();
+						}
+
 						console.log("Found the following records");
 						resolve(docs);
 				 
