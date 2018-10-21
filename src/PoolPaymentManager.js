@@ -7,20 +7,20 @@ const ONE_DAY_MILLISECONDS = 24*60*60*1000;
 
 module.exports = class PoolPaymentManager {
 	processPool(pool) {
-		console.log(`checking ${pool.id} pool if it should be paid for`);
+		console.log(`checking pool ${pool.id} if it should be paid for`);
 
-		if (pool.end >= Date.now()/1000 && pool.end <= (Date.now() + (ONE_DAY_SECONDS * 2))/1000) {
+		if (pool.end >= Date.now()/1000 && pool.end <= (Date.now() + (ONE_DAY_MILLISECONDS * 2))/1000) {
 			// pool has not ended so skip it
 			return Promise.resolve();
 		}
 
-		console.log('pool ${pool.id} expired and needs to be paid for');
+		console.log(`pool ${pool.id} expired and needs to be paid for`);
 
 		return new Promise((resolve, reject) => {
-			const { tiers, users, totalUnits, lat, long } = pool;
+			const { tiers, users, totalUnits, lat, long, pluName } = pool;
 
 			const selectedTier = tiers.sort(sortTierDescending)
-				.find(tier => tier.threshold < totalUnits);
+				.find(tier => tier.threshold <= totalUnits);
 
 			Promise.all(users.map(poolUser => {
 				const { units, paymentType } = poolUser;
@@ -28,16 +28,17 @@ module.exports = class PoolPaymentManager {
 
 				const { poolId, userId } = poolUser;
 
-				const paymentType = { userId, paymentType }
-				const destination = paymentDestination;
-
-				return paymentManager.processTransaction(userId, lat, long, amount, paymentType)
+				return paymentManager.processTransaction(userId, lat, long, amount, paymentType, pluName, units)
 					.then(resp => {
+						console.log('response...')
+						console.log(resp);
 						poolController.pay(poolId, userId);
 					}, err => {
+						console.log("errored");
+						console.log(err);
 						reject(err);
 					});
-			})).then(resolve);
+			})).then(resolve, reject);
 		});
 	}
 };

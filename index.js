@@ -1,12 +1,14 @@
 const PaymentManager = require('./src/PaymentManager.js');
 const PoolController = require('./src/PoolController.js');
 const PoolPaymentManager = require('./src/PoolPaymentManager.js');
+const PayPalManager = require('./src/PayPalManager.js');
 
 const cron = require('node-cron');
 const express = require('express');
 const path = require('path');
 const PORT = process.env.PORT || 5000
 
+const payPalManager = new PayPalManager();
 const poolController = new PoolController();
 const poolPaymentManager = new PoolPaymentManager();
 
