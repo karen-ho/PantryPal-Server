@@ -17,6 +17,7 @@
 		background-color: #fff;
 		text-align: center;
 
+		border-bottom: 2px solid #157CC6;
 		-webkit-box-shadow: 0px 2px 17px -1px rgba(220,220,220,1);
 		-moz-box-shadow: 0px 2px 17px -1px rgba(220,220,220,1);
 		box-shadow: 0px 2px 17px -1px rgba(220,220,220,1);
@@ -70,7 +71,7 @@
 	}
 
 	.header a:hover {
-		border-bottom: 2px solid #157CC6;
+		border-bottom: 2px solid #29BF2F;
 	}
 
 	.header h1 {
@@ -372,7 +373,15 @@
 
 
 
-			
+		document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+		    anchor.addEventListener('click', function (e) {
+		        e.preventDefault();
+
+		        document.querySelector(this.getAttribute('href')).scrollIntoView({
+		            behavior: 'smooth'
+		        });
+		    });
+		});
 
 	</script>
 </body>
