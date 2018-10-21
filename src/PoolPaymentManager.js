@@ -17,25 +17,27 @@ module.exports = class PoolPaymentManager {
 		console.log('pool ${pool.id} expired and needs to be paid for');
 
 		return new Promise((resolve, reject) => {
-			const { tiers, users, totalUnits } = pool;
+			const { tiers, users, totalUnits, lat, long } = pool;
 
 			const selectedTier = tiers.sort(sortTierDescending)
 				.find(tier => tier.threshold < totalUnits);
 
-			users.map(poolUser => {
-				const { units } = poolUser;
+			Promise.all(users.map(poolUser => {
+				const { units, paymentType } = poolUser;
 				const amount = selectedTier.price * units;
 
 				const { poolId, userId } = poolUser;
 
-				// src, destination, amount
-				Promise.all(paymentManager.processTransaction(src, destination, amount)
+				const paymentType = { userId, paymentType }
+				const destination = paymentDestination;
+
+				return paymentManager.processTransaction(userId, lat, long, amount, paymentType)
 					.then(resp => {
 						poolController.pay(poolId, userId);
 					}, err => {
 						reject(err);
-					})).then(resolve);
-			});
+					});
+			})).then(resolve);
 		});
 	}
 };

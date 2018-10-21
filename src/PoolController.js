@@ -1,5 +1,3 @@
-const PaymentManager = require('./PaymentManager.js');
-
 const PoolDao = require('./PoolDao.js');
 const PoolUserDao = require('./PoolUserDao.js');
 const PoolTierDao = require('./PoolTierDao.js');

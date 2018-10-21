@@ -138,7 +138,7 @@ module.exports = class Dao {
 						}
 
 						resolve(docs.ops);
-				 
+
 						client.close();
 					});
 				};
