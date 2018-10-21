@@ -17,10 +17,17 @@ module.exports = class PoolController {
 		return poolDao.findNearest(lat, long);
 	}
 
+	getPoolsWithUsers() {
+		return poolDao.getAll()
+			.then(pools => Promise.all(pools.map(fetchTiers)))
+			.then(pools => Promise.all(pools.map(fetchTotalUnits)))
+			.then(pools => Promise.all(pools.map(fetchUsers)));
+	}
+
 	getPools() {
 		return poolDao.getAll()
 			.then(pools => Promise.all(pools.map(fetchTiers)))
-			.then(pools => Promise.all(pools.map(fetchUsers)));
+			.then(pools => Promise.all(pools.map(fetchTotalUnits)));
 	}
 
 	createPools(pools) {
@@ -63,7 +70,7 @@ module.exports = class PoolController {
 	getPool(poolId) {
 		return poolDao.get(poolId)
 			.then(fetchTiers)
-			.then(fetchUsers);
+			.then(fetchTotalUnits);
 	}
 
 	join(poolId, userId, units) {
@@ -97,29 +104,22 @@ module.exports = class PoolController {
 			});
 	}
 
-	collect(poolId, userId) {
-		return poolUserDao.filter({ id: poolId, userId, paid: null })
-			.then(res => {
-				if (res) {
-					// do the order transaction now...
-					PaymentManager.doTransaction()
-						.then(
-							transactionId => {
-								poolUserDao.update({ poolId }, { paid: Date.now()/1000 });
-								return transactionId;
-							},
-							error => error
-						);
-
-					// mark the item as paid
-				}
-
-				return {};
-			});
+	pay(poolId, userId) {
+		return poolUserDao.update({ poolId, userId, paid: null }, { paid: true });
 	}
 }
 
 function fetchUsers(pool) {
+	if (!pool) return pool;
+
+	const { id } = pool;
+	const poolId = id;
+
+	return poolUserDao.filter({ poolId })
+		.then(users => ({ ...pool, users }));
+}
+
+function fetchTotalUnits(pool) {
 	if (!pool) return pool;
 
 	const { id } = pool;

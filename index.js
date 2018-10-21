@@ -1,12 +1,26 @@
 const PoolController = require('./src/PoolController.js');
+const PoolPaymentManager = require('./src/PoolPaymentManager.js');
 
+const cron = require('node-cron');
 const express = require('express')
 const path = require('path')
 const PORT = process.env.PORT || 5000
 
 const poolController = new PoolController();
+const poolPaymentManager = new PoolPaymentManager();
 
 const app = express();
+
+/** cron jobs **/
+cron.schedule('0 0 1 * * *', runPoolPaymentJob);
+
+function runPoolPaymentJob() {
+  console.log(`running pool payment job ${Date.now()}`);
+  poolController.getPoolsWithUsers()
+    .then(pools => {
+      return pools.map(poolPaymentManager.processPool);
+    });
+}
 
 // list all pools
 app.get('/api/v1/pools', function(req, res) {
@@ -97,12 +111,6 @@ app.delete('/api/v1/pools/:poolId/users/:userId', function(req, res) {
         pools => res.send(pools),
         err => res.send(err));
     });
-});
-
-// confirm a purchase
-app.post('/api/v1/pools/:poolId/users/:userId/purchase', function(req, res) {
-	const { userId, poolId } = req.params;
-	res.send(poolController.collect(poolId, userId));
 });
 
 app.listen(PORT, () => console.log(`Listening on ${ PORT }`))
