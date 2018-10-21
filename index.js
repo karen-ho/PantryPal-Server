@@ -118,4 +118,12 @@ app.delete('/api/v1/pools/:poolId/users/:userId', function(req, res) {
     });
 });
 
+app.use(express.static('public'));
+app.set('views', __dirname + '/views');
+app.engine('html', require('ejs').renderFile);
+
+app.get('/', (req, res) => {
+  res.render('pages/index.html')
+});
+
 app.listen(PORT, () => console.log(`Listening on ${ PORT }`))
