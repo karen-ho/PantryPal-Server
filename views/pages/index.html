@@ -57,6 +57,7 @@
 		float: left;
 		text-align: left;
 		display: inline-block;
+		margin-left: 48px;
 	}
 
 	.header .right {
@@ -201,6 +202,7 @@
 		background-repeat: no-repeat;
 		background-size: 64px 64px;
 		background-position: 8px 8px;
+		height: 80px;
 	}
 
 	@media only screen and (min-width: 560px) {
@@ -230,6 +232,11 @@
 	}
 
 	@media only screen and (min-width: 720px) {
+		.panel {
+			width: 600px;
+			padding-right: 60px;
+		}
+
 		.panel p {
 			width: 400px;
 		}
@@ -237,11 +244,19 @@
 		#pantry {
 			transform: scale(1);
 		}
+
+		.header .left h1 {
+			font-size: 32px;
+		}
 	}
 
 	@media only screen and (min-width: 778px) {
 		.header .right {
 			display: inline-block;
+		}
+
+		.header .left {
+			margin-left: 0;
 		}
 
 		#pantry {	
@@ -251,7 +266,6 @@
 		.panel {
 			text-align: center;
 			margin: 0 auto;
-			width: 800px;
 		}
 
 		.panel > * {
@@ -269,6 +283,12 @@
 
 		#outcome h1 {
 			width: 20px;
+		}
+	}
+
+	@media only screen and (min-width: 800px) {
+		.panel {
+			width: 800px;
 		}
 	}
 
@@ -370,8 +390,6 @@
 		new ScrollMagic.Scene({ triggerElement: '#contact-us' })
 			.setTween("#soap", 0.4, { opacity: 1})
 			.addTo(controller);
-
-
 
 		document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 		    anchor.addEventListener('click', function (e) {
