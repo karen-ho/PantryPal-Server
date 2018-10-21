@@ -1,0 +1,379 @@
+<!doctype>
+<html>
+<head>
+	<title>PantryPal</title>
+	<link href="https://fonts.googleapis.com/css?family=PT+Sans+Narrow|Questrial" rel="stylesheet" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.0.2/TweenMax.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.6/ScrollMagic.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.6/plugins/animation.gsap.min.js"></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style type="text/css">
+	.header {
+		position: fixed;
+		top: 0;
+		width: 100%;
+		height: 80px;
+		line-height: 80px;
+		background-color: #fff;
+		text-align: center;
+
+		-webkit-box-shadow: 0px 2px 17px -1px rgba(220,220,220,1);
+		-moz-box-shadow: 0px 2px 17px -1px rgba(220,220,220,1);
+		box-shadow: 0px 2px 17px -1px rgba(220,220,220,1);
+	}
+
+	h1, .title {
+		font-family: 'Questrial', sans-serif;
+		margin: 0;
+	}
+
+	body {
+		margin: 0;
+		font-family: 'PT Sans Narrow', sans-serif;
+	}
+
+	#problem {
+		margin-top: 80px;
+		padding-top: 80px;
+		padding-bottom: 200px;
+	}
+
+	.panel {
+		margin: 0 40px;
+		text-align: left;
+	}
+
+	.footer {
+		height: 60px;
+		background-color: #333;
+		color: #f2f2f2;
+		text-align: center;
+		line-height: 60px;
+		font-size: 14px;
+	}
+
+	.header .left {
+		float: left;
+		text-align: left;
+		display: inline-block;
+	}
+
+	.header .right {
+		display: none;
+	}
+
+	.header a, .header a:link, .header a:visited {
+		text-decoration: none;
+		color: #333;
+		font-size: 24px;
+		padding: 26px 16px;
+	}
+
+	.header a:hover {
+		border-bottom: 2px solid #157CC6;
+	}
+
+	.header h1 {
+		font-size: 48px;
+		margin-left: 32px;
+	}
+
+	#main {
+		padding-top: 120px;
+		padding-bottom: 240px;
+		background-color: #157CC6;
+		color: #f2f2f2;
+	}
+
+	p {
+		font-size: 18px;
+	}
+
+	.panel h1, .panel p {
+		width: 280px;
+	}
+
+	#pantry {
+		transform: scale(0.6);
+		top: 110px;
+		position: fixed;
+		z-index: 5;
+		left: 53%;
+		display: none;
+	}
+
+	#pantry-main {
+		width: 280px;
+	}
+
+	#detergent {
+		position: absolute;
+		z-index: 10;
+		width: 32px;
+		left: 142px;
+		top: 149px;
+		opacity: 0;
+	}
+
+	#toilet-paper {
+		position: absolute;
+		z-index: 9;
+		width: 37px;
+		left: 105px;
+		top: 149px;
+		opacity: 0;
+	}
+
+	#food {
+		position: absolute;
+		z-index: 9;
+		width: 47px;
+		left: 58px;
+		top: 149px;
+		opacity: 0;
+	}
+
+	#towels {
+		position: absolute;
+		z-index: 10;
+		width: 42px;
+		left: 173px;
+		top: 149px;
+		opacity: 0;
+	}
+
+	#jars {
+		position: absolute;
+		z-index: 8;
+		width: 140px;
+		left: 58px;
+		top: 67px;
+		opacity: 0;
+	}
+
+	#soap {
+		position: absolute;
+		z-index: 8;
+		width: 105px;
+		left: 87px;
+		top: 10px;
+		opacity: 0;
+	}
+
+	#boxes {
+		position: absolute;
+		z-index: 7;
+		width: 132px;
+		left: 58px;
+		top: 117px;
+		opacity: 0;
+	}
+
+	#crackers {
+		position: absolute;
+		z-index: 6;
+		width: 30px;
+		left: 189px;
+		top: 117px;
+		opacity: 0;
+	}
+
+	#community-driven {
+		padding-top: 120px;
+		padding-bottom: 240px;
+	}
+
+	#outcome {
+		padding-top: 120px;
+		padding-bottom: 340px;
+		background-color: #157CC6;
+		color: #f2f2f2;
+	}
+
+	#contact-us {
+		padding-top: 200px;
+		padding-bottom: 400px;
+	}
+
+	.inner-container {
+		background-image: url('/logo.png');
+		background-repeat: no-repeat;
+		background-size: 64px 64px;
+		background-position: 8px 8px;
+	}
+
+	@media only screen and (min-width: 560px) {
+		#pantry {
+			display: block;
+		}
+
+		.panel h1 {
+			width: inherit;
+		}
+
+		h1 {
+			font-size: 42px;
+		}
+
+		#main h1 {
+			width: 360px;
+		}
+
+		.panel p {
+			width: 400px;
+		}
+
+		#pantry {
+			left: 60%;
+		}
+	}
+
+	@media only screen and (min-width: 720px) {
+		.panel p {
+			width: 400px;
+		}
+
+		#pantry {
+			transform: scale(1);
+		}
+	}
+
+	@media only screen and (min-width: 778px) {
+		.header .right {
+			display: inline-block;
+		}
+
+		#pantry {	
+			top: 240px;
+		}
+
+		.panel {
+			text-align: center;
+			margin: 0 auto;
+			width: 800px;
+		}
+
+		.panel > * {
+			text-align: left;
+		}
+
+		.header h1 {
+			font-size: 48px;
+			margin-left: 80px;
+		}
+
+		#problem {
+			padding-top: 240px;
+		}
+
+		#outcome h1 {
+			width: 20px;
+		}
+	}
+
+	@media only screen and (min-width: 960px) {
+		.inner-container {
+			width: 900px;
+			margin: 0 auto;
+		}
+	}
+	</style>
+	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+	<link rel="icon" href="/favicon.ico" type="image/x-icon" />
+</head>
+<body>
+	<div class="header">
+		<div class="inner-container">
+			<div class="left">
+				<h1>PantryPal</h1>
+			</div>
+			<div class="right">
+				<div class="links">
+					<a href="#problem">Home</a>
+					<a href="#main">Savings</a>
+					<a href="#outcome">Mission</a>
+					<a href="#community-driven">Community</a>
+					<a href="#contact-us">Contact Us</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="pantry">
+		<img src="/food.png" alt="Food" id="food" />
+		<img src="/boxes.png" alt="Boxes" id="boxes" />
+		<img src="/crackers.png" alt="Crackers" id="crackers" />
+		<img src="/toilet_paper.png" alt="Toilet Paper" id="toilet-paper" />
+		<img src="/soap.png" alt="Soap" id="soap" />
+		<img src="/detergent.png" alt="Detergent" id="detergent" />
+		<img src="/jars.png" alt="Jams" id="jars" />
+		<img src="/towels.png" alt="Towels" id="towels" />
+		<img src="/pantry.png" alt="A Pantry" id="pantry-main" />
+	</div>
+
+	<div id="problem">
+		<div class="panel">
+			<h1>Empty Pantries</h1>
+			<p>What does a stocked pantry mean? It means stability and security. These are fundamental rights that all hard-working humans should have.</p>
+		</div>
+	</div>
+
+	<div id="main">
+		<div class="panel">
+			<h1>Better Pricing, More Savings</h1>
+			<p>By having neighborhoods come together to buy in bulk, communities can begin to thrive. Communities that are no longer struggling can commit more time to focusing on the important things in life.</p>
+		</div>
+	</div>
+
+	<div id="community-driven">
+		<div class="panel">
+			<h1>Community Driven</h1>
+			<p>In the end, it's all about people coming together as a community. This enables more visibility between people in the same community to say how products should be priced.</p>
+		</div>
+	</div>
+
+	<div id="outcome">
+		<div class="panel">
+			<h1>Fill Every Pantry</h1>
+			<p>By paving the way for every hard-working American to have a full pantry, it means having an obtainable way for Americans to reclaim stability.</p>
+		</div>
+	</div>
+
+	<div id="contact-us">
+		<div class="panel">
+			<h1>Contact Us</h1>
+			<p>Talk to us here at Money 20/20.</p>
+		</div>
+	</div>
+
+
+	<div class="footer">
+		Thank you for visiting!
+	</div>
+
+	<script type="text/javascript">
+		var controller = new ScrollMagic.Controller({ globalSceneOptions: { duration: 300 }});
+
+		new ScrollMagic.Scene({ triggerElement: '#main' })
+			.setTween("#detergent, #toilet-paper, #food", 0.4, { opacity: 1})
+			.addTo(controller);
+
+		new ScrollMagic.Scene({ triggerElement: '#community-driven' })
+			.setTween("#boxes, #crackers", 0.4, { opacity: 1})
+			.addTo(controller);
+
+		new ScrollMagic.Scene({ triggerElement: '#outcome' })
+			.setTween("#towels, #jars", 0.4, { opacity: 1})
+			.addTo(controller);
+
+		new ScrollMagic.Scene({ triggerElement: '#contact-us' })
+			.setTween("#soap", 0.4, { opacity: 1})
+			.addTo(controller);
+
+
+
+			
+
+	</script>
+</body>
+</html>
