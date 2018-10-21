@@ -53,25 +53,32 @@ module.exports = class PoolController {
 			.then(fetchUsers);
 	}
 
-	join(poolId, userId) {
-		return poolUserDao.filter({ id: poolId, userId, deleted: true, paid: null })
+	join(poolId, userId, units) {
+		return poolUserDao.filter({ poolId, userId, paid: null })
 			.then(res => {
-				if (res) {
+				if (res && res.length) {
 					// toggle the deleted
-					return poolUserDao.update(poolId, { deleted: false, deletedTimestamp: Date.now() });
+					const newUnits = units + res[0].units;
+					return poolUserDao.update({ poolId }, { units: newUnits })
+//						.then(poolUser => ({ units: poolUser.units }));
+						.then(poolUser => ({ units: newUnits }));
 				} else {
 					// we create one
-					return poolUserDao.create({ id: poolId, userId, deleted: false, deletedTimestamp: null, paid: null });
+					return poolUserDao.create([{ poolId, userId, paid: null, units }])
+						.then(poolUsers => {
+							return { units: poolUsers[0].units };
+						});
 				}
 			});
 	}
 
-	leave(poolId, userId) {
-		return poolUserDao.filter({ id: poolId, userId, deleted: false, paid: null })
+	leave(poolId, userId, units) {
+		return poolUserDao.filter({ poolId, userId, paid: null })
 			.then(res => {
-				if (res) {
-					// toggle the deleted
-					return poolUserDao.update(poolId, { deleted: true, deletedTimestamp: Date.now() });
+				if (res && res.length) {
+					const newUnits = res[0].units - units;
+					return poolUserDao.update({ poolId }, { units: newUnits })
+						.then(poolUser => ({ units: newUnits }));
 				}
 
 				return {};
@@ -79,14 +86,14 @@ module.exports = class PoolController {
 	}
 
 	collect(poolId, userId) {
-		return poolUserDao.filter({ id: poolId, userId, deleted: false, paid: null })
+		return poolUserDao.filter({ id: poolId, userId, paid: null })
 			.then(res => {
 				if (res) {
 					// do the order transaction now...
 					PaymentManager.doTransaction()
 						.then(
 							transactionId => {
-								poolUserDao.update(poolId, { paid: Date.now() });
+								poolUserDao.update({ poolId }, { paid: Date.now()/1000 });
 								return transactionId;
 							},
 							error => error
@@ -106,8 +113,11 @@ function fetchUsers(pool) {
 	const { id } = pool;
 	const poolId = id;
 
-	return poolUserDao.filter({ poolId, deleted: false })
-		.then(users => ({ ...pool, users}));
+	return poolUserDao.filter({ poolId })
+		.then(users => {
+			const totalUnits = users.map(user => user.units).reduce((acc, val) => acc + val, 0);
+			return { ...pool, totalUnits };
+		});
 }
 
 function fetchTiers(pool) {

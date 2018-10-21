@@ -59,26 +59,45 @@ app.get('/api/v1/pools/:poolId', function(req, res) {
 });
 
 // join a pool
-app.post('api/v1/pools/:poolId/users/:userId', function(req, res) {
+app.post('/api/v1/pools/:poolId/users/:userId', function(req, res) {
   const { poolId, userId } = req.params;
-  poolController.join(poolId, userId)
-    .then(
-      pools => res.send(pools),
-      err => res.send(err));
+  req.on('data', data => {
+    const body = JSON.parse(data);
 
+    if (!body) {
+      res.send('incomplete');
+      return;
+    }
+
+    const { units } = body;
+    poolController.join(poolId, userId, units)
+      .then(
+        pools => res.send(pools),
+        err => res.send(err));
+  });
 });
 
 // leave a pool
-app.delete('api/v1/pools/:poolId/users/:userId', function(req, res) {
+app.delete('/api/v1/pools/:poolId/users/:userId', function(req, res) {
   const { poolId, userId } = req.params;
-  poolController.leave(poolId, userId)
-    .then(
-      pools => res.send(pools),
-      err => res.send(err));
+  req.on('data', data => {
+    const body = JSON.parse(data);
+
+    if (!body) {
+      res.send('incomplete');
+      return;
+    }
+
+    const { units } = body;
+    poolController.leave(poolId, userId, units)
+      .then(
+        pools => res.send(pools),
+        err => res.send(err));
+    });
 });
 
 // confirm a purchase
-app.post('api/v1/pools/:poolId/users/:userId/purchase', function(req, res) {
+app.post('/api/v1/pools/:poolId/users/:userId/purchase', function(req, res) {
 	const { userId, poolId } = req.params;
 	res.send(poolController.collect(poolId, userId));
 });

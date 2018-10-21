@@ -134,6 +134,7 @@ module.exports = class Dao {
 						if (err) {
 							reject(err);
 							client.close();
+							return;
 						}
 
 						resolve(docs.ops);
@@ -146,7 +147,7 @@ module.exports = class Dao {
 		});
 	}
 
-	update(id, properties) {
+	update(idObj, properties) {
 		return new Promise((resolve, reject) => {
 			MongoClient.connect(url, (err, client) => {
 				if (err) {
@@ -163,10 +164,11 @@ module.exports = class Dao {
 					const collection = db.collection(this.collection);
 
 					// Find some documents
-					collection.updateOne({ id }, { $set: properties }).toArray(function(err, docs) {
+					collection.updateOne(idObj, { $set: properties }, function(err, docs) {
 						if (err) {
 							reject(err);
 							client.close();
+							return;
 						}
 
 						resolve(docs);
