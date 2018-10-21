@@ -23,28 +23,41 @@ module.exports = class PoolController {
 			.then(pools => Promise.all(pools.map(fetchUsers)));
 	}
 
-	createPool(pool) {
-		const { tiers, lat, long } = pool;
-		const copy = { ...pool };
-		delete copy.tiers;
+	createPools(pools) {
+		const poolsToSave = pools.map(pool => {
+			const { tiers, lat, long } = pool;
+			const copy = { ...pool };
+			delete copy.tiers;
 
-		const location = { type: 'Point', coordinates: [+long, +lat] };
-		const poolToSave = { ...copy, location };
+			const location = { type: 'Point', coordinates: [+long, +lat] };
+			const poolToSave = { ...copy, location };
+			return poolToSave;
+		});
 
-		return poolDao.create([poolToSave])
+		const tiers = pools.reduce((acc, val) => {
+			acc[val.id] = val.tiers;
+			return acc;
+		}, {});
+
+		return poolDao.create(poolsToSave)
 			.then(pools => {
-				const [pool] = pools;
+				return Promise.all(pools.map(pool => {
+					const poolId = pool.id;
+					const tierList = tiers[poolId];
 
-				if (!tiers) {
-					console.log('early');
-					return pool;
-				}
+					if (!tierList || !tierList.length) {
+						return pool;
+					}
 
-				const poolId = pool.id;
-				const poolTiers = tiers.map(tiers => ({ ...tiers, poolId }));
+					const poolTiers = tierList.map(tiers => ({ ...tiers, poolId }));
 
-				return poolTierDao.create(poolTiers).then(tiers => ({ ...pool, tiers}));
+					return poolTierDao.create(poolTiers).then(tiers => ({ ...pool, tiers}));
+				}));
 			})
+	}
+
+	createPool(pool) {
+		return this.createPools([pool]);
 	}
 
 	getPool(poolId) {
@@ -60,7 +73,6 @@ module.exports = class PoolController {
 					// toggle the deleted
 					const newUnits = units + res[0].units;
 					return poolUserDao.update({ poolId }, { units: newUnits })
-//						.then(poolUser => ({ units: poolUser.units }));
 						.then(poolUser => ({ units: newUnits }));
 				} else {
 					// we create one

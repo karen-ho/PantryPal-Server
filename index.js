@@ -34,7 +34,7 @@ app.get('/api/v1/pools', function(req, res) {
     });
 });
 
-// create pool
+// create pools
 app.post('/api/v1/pools', function(req, res) {
   req.on('data', data => {
     const body = JSON.parse(data);
@@ -44,8 +44,11 @@ app.post('/api/v1/pools', function(req, res) {
       return;
     }
 
-    poolController.createPool(body)
-      .then(pool => res.send(pool), err => res.send(err));
+    const pools = body;
+    poolController.createPools(pools).then(
+        pools => res.send(pools),
+        err => res.send(err)
+      );
   });
 });
 
